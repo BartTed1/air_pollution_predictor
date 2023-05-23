@@ -22,7 +22,7 @@ def timestamp_to_hour(timestamp) -> int:
 # use data_3h.csv
 # Load data from CSV
 
-with open('../data/3h/data_3h_Bydgoszcz.csv', 'r') as file:
+with open('../../data/3h/data_3h_Bydgoszcz.csv', 'r') as file:
 	csv_reader = csv.reader(file)
 	data = []
 	labels = []
