@@ -2,88 +2,87 @@ import numpy as np
 import pandas as pd
 import sys
 import codecs
-
-from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error 
-
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error
+from sklearn.svm import SVR
 
-sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+class SupportVectorRegression:
+    def __init__(self):
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+        self.file_path = "data_3h_Bydgoszcz.csv"
 
-file_path = "data_3h_Bydgoszcz.csv"
+    def load_data(self):
+        self.data = pd.read_csv(self.file_path, header=None)
+        self.data.columns = ["name", "lat", "lon", "temp", "humidity", "pressure", "wind_speed", "wind_deg", "timestamp",
+                             "pm2_5", "pm10", "co", "no", "no2", "o3", "so2", "nh3", "temp_label", "humidity_label",
+                             "pressure_label", "wind_speed_label", "wind_deg_label", "pm2_5_label", "pm10_label", "co_label",
+                             "no_label", "no2_label", "o3_label", "so2_label", "nh3_label"]
 
-# Wczytanie danych z pliku CSV
-data = pd.read_csv(file_path, header=None)
+    def filter_data(self):
+        filtered_data = self.data[self.data["name"].isin(["Bydgoszcz", "BydgoszczParkPrzemyslowy"])]
+        self.filtered_data = filtered_data[["name", "pm2_5"]]
 
-# Nadanie odpowiednich nazw kolumn
-data.columns = ["name", "lat", "lon", "temp", "humidity", "pressure", "wind_speed", "wind_deg", "timestamp",
-                "pm2_5", "pm10", "co", "no", "no2", "o3", "so2", "nh3", "temp_label", "humidity_label",
-                "pressure_label", "wind_speed_label", "wind_deg_label", "pm2_5_label", "pm10_label", "co_label",
-                "no_label", "no2_label", "o3_label", "so2_label", "nh3_label"]
+    def display_pm2_5_values(self):
+        self.pm2_5_values = self.filtered_data["pm2_5"].tolist()
+        self.combined_values_list = ", ".join(str(value) for value in self.pm2_5_values).split(", ")
+        print(self.combined_values_list)
 
-# Filtracja danych dla miast "Bydgoszcz" i "BydgoszczParkPrzemyslowy" oraz kolumny "pm2_5"
-filtered_data = data[data["name"].isin(["Bydgoszcz", "BydgoszczParkPrzemyslowy"])]
-filtered_data = filtered_data[["name", "pm2_5"]]
+    def prepare_input_data(self):
+        self.X = np.arange(len(self.combined_values_list)).reshape(-1, 1)
+        self.y = np.array(self.combined_values_list, dtype=float)
 
-# Wyświetlenie wartości "pm2_5" dla obu miast
-pm2_5_values = filtered_data["pm2_5"].tolist()
-combined_values = ", ".join(str(value) for value in pm2_5_values)
+    def train_model(self):
+        self.model = SVR()
+        self.model.fit(self.X, self.y)
 
-combined_values_list = combined_values.split(", ")
+    def predict_values(self):
+        self.predicted_values = self.model.predict(self.X)
+        self.predicted_values_formatted = [f"{value:.2f}" for value in self.predicted_values]
 
-# Wyświetlenie przekształconych danych
-print(combined_values_list)
+    def display_for_every_index(self):
+        print(f"Przewidywane wartości pm2_5 dla wszystkich poprzednich indeksów: {self.predicted_values_formatted}")
 
-#====================================================================================
-# Przygotowanie danych wejściowych
-X = np.arange(len(combined_values_list)).reshape(-1, 1)
-y = np.array(combined_values_list, dtype=float)
+    def predict_next_value(self):
+        self.next_index = len(self.combined_values_list)
+        self.next_value = self.model.predict([[self.next_index]])
 
-# Inicjalizacja i wytrenowanie modelu SVR
-model = SVR()
-model.fit(X, y)
+    def calculate_mae(self):
+        self.mae = mean_absolute_error(self.y, self.predicted_values)
 
-# Przewidywanie wartości pm2_5 dla wszystkich poprzednich indeksów
-predicted_values = model.predict(X)
-predicted_values_formatted = [f"{value:.2f}" for value in predicted_values]
+    def calculate_percentage_mae(self):
+        mean_values = np.mean(self.y)
+        self.percentage_mae = (self.mae / mean_values) * 100
+        print(f"Przewidywana wartość pm2_5: {self.next_value[0]}")
+        print(f"Procentowy błąd bezwzględny średni (MAE): {self.percentage_mae}")
 
-# Wyświetlanie przewidywanych wartości pm2_5 dla wszystkich indeksów
-print("Przewidywane wartości pm2_5 dla wszystkich poprzednich indeksów:")
-print(predicted_values_formatted)
+    def calculate_error_margin(self):
+        diff = np.abs(np.array(self.combined_values_list, dtype=float) - np.array(self.predicted_values_formatted, dtype=float))
+        self.mean_error = np.mean(diff)
+        self.percent_error = (self.mean_error / np.mean(np.array(self.predicted_values_formatted, dtype=float))) * 100
+        print(f"Margines błędu między danymi (w procentach): {self.percent_error}")
 
-# Przewidywanie wartości pm2_5 dla kolejnego indeksu
-next_index = len(combined_values_list)
-next_value = model.predict([[next_index]])
+    def chart(self):
+        pm2_5_values = list(map(float, self.combined_values_list))
+        predicted_values = list(map(float, self.predicted_values_formatted))
 
-# Obliczanie błędu bezwzględnego średniego (MAE)
-mae = mean_absolute_error(y, predicted_values)
+        plt.plot(pm2_5_values, label='PM2.5')
+        plt.plot(predicted_values, label='Przewidywane dane')
+        plt.title("Wykres PM2.5 z przewidywanymi danymi")
+        plt.ylabel("PM2.5")
+        plt.legend()
+        plt.show()
 
-# Obliczanie procentowego błędu bezwzględnego średniego (MAE)
-mean_values = np.mean(y)
-percentage_mae = (mae / mean_values) * 100
 
-print("Przewidywana wartość pm2_5:", next_value[0])
-print("Procentowy błąd bezwzględny średni (MAE):", percentage_mae)
-
-#====================================================================================
-# OBLICZENIE MARGINESU BLEDU ROZBIEZNOSCI DANYCH
-
-diff = np.abs(np.array(combined_values_list, dtype=float) - np.array(predicted_values_formatted, dtype=float))
-mean_error = np.mean(diff)
-percent_error = (mean_error / np.mean(np.array(predicted_values_formatted, dtype=float))) * 100
-print("Margines błędu między danymi (w procentach):", percent_error)
-
-#====================================================================================
-# RYSOWANIE WYKRESU PM2.5
-
-# Konwertowanie wartości na liczby zmiennoprzecinkowe
-pm2_5_values = list(map(float, combined_values_list))
-predicted_values = list(map(float, predicted_values_formatted))
-
-# Tworzenie wykresu
-plt.plot(pm2_5_values, label='PM2.5')
-plt.plot(predicted_values, label='Przewidywane dane')
-plt.title("Wykres PM2.5 z przewidywanymi danymi")
-plt.ylabel("PM2.5")
-plt.legend()  # Dodanie legendy
-plt.show()
+# svr = SupportVectorRegression()
+# svr.load_data()
+# svr.filter_data()
+# svr.display_pm2_5_values()
+# svr.prepare_input_data()
+# svr.train_model()
+# svr.predict_values()
+# svr.display_for_every_index()
+# svr.predict_next_value()
+# svr.calculate_mae()
+# svr.calculate_percentage_mae()
+# svr.calculate_error_margin()
+# svr.chart()
