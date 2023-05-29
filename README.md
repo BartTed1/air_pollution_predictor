@@ -14,6 +14,8 @@ data
 │   └── 3h
 │       ├── model.py
 │       └── neural_network.py
+│       └── random_forest.py
+│       └── svr_prediction.py
 ├── statistics
 │   └── 3h
 │       └── statistics.py - statistical analysis of training data
