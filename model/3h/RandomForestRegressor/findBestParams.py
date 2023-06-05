@@ -52,14 +52,29 @@ param_grid = {
 # Inicjalizacja modelu
 model = RandomForestRegressor()
 
-# Inicjalizacja GridSearchCV
-grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=10)
+# Liczba powtorzen petli
+num_iterations = 5
 
-# Dopasowanie modelu do danych treningowych
-grid_search.fit(X_train, y_train)
+# Inicjalizacja pustej listy na wyniki
+results = []
 
-# Wybor najlepszych parametrow
-best_params = grid_search.best_params_
+for i in range(num_iterations):
+    # Inicjalizacja GridSearchCV
+    grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=10)
 
-# Wyswietlenie najlepszych parametrow
-print(best_params)
+    # Dopasowanie modelu do danych treningowych
+    grid_search.fit(X_train, y_train)
+
+    # Wybor najlepszych parametrow
+    best_params = grid_search.best_params_
+
+    # Dodanie wynikow do listy
+    result = f"{i+1}: {best_params}"
+    results.append(result)
+
+    # Wypisanie wynikow w konsoli
+    print(result)
+
+with open('results.txt', 'w') as file:
+    for result in results:
+        file.write(result + "\n")
