@@ -23,7 +23,7 @@ class NeuralNetwork:
         # Define the layers of the neural network
         self.model = tf.keras.Sequential([
             tf.keras.layers.Dense(64, activation='relu', input_shape=(self.input_dim,)),
-            tf.keras.layers.Dropout(0.2),
+            #tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(32, activation='linear'),
             tf.keras.layers.Dense(self.output_dim)
         ])
