@@ -15,9 +15,10 @@ sys.path.append('./model/3h/RandomForestRegressor')
 import forest
 
 sys.path.append('./model/3h/NeuralNetwork')
-import test as nnTest
+import nntest as nnTest
 import neural_network as nn
 import timeutils as ts
+
 
 #TODO dodac okno z marginesem bledow
 
@@ -167,17 +168,13 @@ class GUI(QMainWindow):
         #print(predictions)
 
         # Save the neural network
-        neural_network.save()
+        #neural_network.save()
 
         # Load the neural network
-        neural_network.load('model.h5')
+        #neural_network.load('model.h5')
 
         # Use the neural network to make predictions
         # neural_network.predict()
-
-        # Print predictions
-        predictions_neural = test.forecast(12)
-        #print(predictions_neural)
 
         # Convert predictions to a list of pm2.5 values
         pm25_predictions = [pred[0] for pred in predictions_neural]
@@ -203,10 +200,8 @@ class GUI(QMainWindow):
             index = legends.index(leg)
             line = lines[index]
             isVisible = line.get_visible()
-
             line.set_visible(not isVisible)
             leg.set_visible(not isVisible)
-
             fig.canvas.draw()
 
         fig.canvas.mpl_connect('pick_event', on_pick)
@@ -220,5 +215,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     gui = GUI()
     gui.show()
-
     sys.exit(app.exec_())
