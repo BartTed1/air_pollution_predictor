@@ -9,7 +9,8 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 sys.path.append('./model/3h/RandomForestRegressor')
-import forest
+from forest import LasLosowy
+forest = LasLosowy()
 
 sys.path.append('./model/3h/NeuralNetwork')
 import nntest as nnTest
