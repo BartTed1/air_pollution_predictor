@@ -1,14 +1,11 @@
 import csv
 import sys
-import os
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLineEdit, QMessageBox, QLabel, QComboBox, QCheckBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLineEdit, QMessageBox, QLabel, QLabel
 from PyQt5.QtCore import Qt, QFileInfo
 from PyQt5.QtGui import QIcon, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
-from matplotlib.widgets import CheckButtons
 import matplotlib.pyplot as plt
 
 sys.path.append('./model/3h/RandomForestRegressor')
@@ -18,7 +15,6 @@ sys.path.append('./model/3h/NeuralNetwork')
 import nntest as nnTest
 import neural_network as nn
 import timeutils as ts
-
 
 #TODO dodac okno z marginesem bledow
 
@@ -91,6 +87,7 @@ class GUI(QMainWindow):
         if self.line_edit.text() == '' or self.line_edit2.text() == '':
             QMessageBox.warning(self, "Błąd", "Nie wybrano obu plików. Proszę wybrać pliki CSV.")
             return
+
         # Wybór wybranych cech
         selected_features = ['pm2_5', 'wind_speed', 'wind_deg', 'temp', 'humidity']
 
@@ -155,9 +152,10 @@ class GUI(QMainWindow):
         # Create a neural network object
         neural_network = nn.NeuralNetwork(data, labels)
 
+        # Tutaj dodac bar loading
         # Build and train the neural network
         neural_network.build_and_train()
-
+        
         # Create a test object
         test = nnTest.NNTest(neural_network, data2, labels2)
 
@@ -188,6 +186,19 @@ class GUI(QMainWindow):
         line3, = ax.plot(pm25_predictions, label='Sieci neuronowe')
         lines = [line1, line2, line3]
 
+        prawdziwe_wartosci_pm2_5 = self.data_pred['pm2_5']
+
+        correct_forest = 0
+        incorrect_forest = 0
+
+        for i in range(1, len(prawdziwe_wartosci_pm2_5)):
+            predicted_change = (predictions[i] - predictions[i-1]) > 0
+            actual_change = (prawdziwe_wartosci_pm2_5[i] - prawdziwe_wartosci_pm2_5[i-1]) > 0
+            if predicted_change == actual_change:
+                correct_forest += 1
+            else:
+                incorrect_forest += 1
+
         legend = ax.legend(loc='upper right')
         legends = legend.get_lines()
 
@@ -208,8 +219,93 @@ class GUI(QMainWindow):
         plt.xlabel('Indeks próbki')
         plt.ylabel('Wartość pm2_5')
         plt.title('Porównanie wartości aktualnych i przewidywanych')
+
         plt.show()
 
+        correct, incorrect = test.pobierz_trendy()
+        text = f"Correct: {correct}, Incorrect: {incorrect}"
+
+        text2 = f"Correct: {correct_forest}, Incorrect: {incorrect_forest}"
+
+        def oblicz_margines_bledu(wartosci_rzeczywiste, przewidywania):
+            if len(wartosci_rzeczywiste) != len(przewidywania):
+                raise ValueError("Liczba wartości rzeczywistych i przewidywanych musi być taka sama.")
+            
+            liczba_wartosci = len(wartosci_rzeczywiste)
+            margines_bledu = sum(abs(przewidywania[i] - wartosci_rzeczywiste[i]) / wartosci_rzeczywiste[i] for i in range(liczba_wartosci))
+            procentowy_margines_bledu = (margines_bledu / liczba_wartosci) * 100
+            
+            tekst_procentowy_margines_bledu = "{:.2f}%".format(procentowy_margines_bledu)
+
+            return tekst_procentowy_margines_bledu
+
+        # obliczanie marginesu bledu
+        margines_bledu_sieci_neuronowe = oblicz_margines_bledu(prawdziwe_wartosci_pm2_5, pm25_predictions)
+        margines_bledu_las_losowy = oblicz_margines_bledu(prawdziwe_wartosci_pm2_5, predictions)
+
+        # OKNO TRENDOW
+        self.oknoTrendow = QMainWindow()
+        self.oknoTrendow.setWindowTitle("Trendy")
+        self.oknoTrendow.setFixedSize(400, 300)
+        self.oknoTrendow.move(100, 100)
+        logo_icon = QIcon("logo.png")
+        self.oknoTrendow.setWindowIcon(logo_icon)
+
+        font = QFont("Arial", 12, QFont.Bold)
+
+        labelGlownyTrendy = QLabel("TRENDY", self.oknoTrendow)
+        labelGlownyTrendy.setFont(font)
+        labelGlownyTrendy.setGeometry(0, -60, 400, 300)
+        labelGlownyTrendy.setAlignment(Qt.AlignCenter)
+
+        label = QLabel("Sieci neuronowe", self.oknoTrendow)
+        label.setGeometry(0, -30, 400, 300)
+        label.setAlignment(Qt.AlignCenter)
+
+        label2 = QLabel(text, self.oknoTrendow)
+        label2.setGeometry(0, 0, 400, 300)
+        label2.setAlignment(Qt.AlignCenter)
+
+        label3 = QLabel("Las losowy", self.oknoTrendow)
+        label3.setGeometry(0, 30, 400, 300)
+        label3.setAlignment(Qt.AlignCenter)
+
+        label4 = QLabel(text2, self.oknoTrendow)
+        label4.setGeometry(0, 60, 400, 300)
+        label4.setAlignment(Qt.AlignCenter)
+
+        self.oknoTrendow.show()
+
+        # OKNO MARGINESU BLEDU
+        self.oknoMarginesuBledu = QMainWindow()
+        self.oknoMarginesuBledu.setWindowTitle("Marginesy błędu")
+        self.oknoMarginesuBledu.setFixedSize(400, 300)
+        self.oknoMarginesuBledu.move(100, 500)
+        logo_icon = QIcon("logo.png")
+        self.oknoMarginesuBledu.setWindowIcon(logo_icon)
+
+        labelGlownyMarginesBledu = QLabel("MARGINESY BŁĘDU", self.oknoMarginesuBledu)
+        labelGlownyMarginesBledu.setFont(font)
+        labelGlownyMarginesBledu.setGeometry(0, -60, 400, 300)
+        labelGlownyMarginesBledu.setAlignment(Qt.AlignCenter)
+
+        label5 = QLabel("Sieci neuronowe", self.oknoMarginesuBledu)
+        label5.setGeometry(0, -30, 400, 300)
+        label5.setAlignment(Qt.AlignCenter)
+
+        label6 = QLabel(margines_bledu_sieci_neuronowe, self.oknoMarginesuBledu)
+        label6.setGeometry(0, 0, 400, 300)
+        label6.setAlignment(Qt.AlignCenter)
+
+        label7 = QLabel("Las losowy", self.oknoMarginesuBledu)
+        label7.setGeometry(0, 30, 400, 300)
+        label7.setAlignment(Qt.AlignCenter)
+
+        label8 = QLabel(margines_bledu_las_losowy, self.oknoMarginesuBledu)
+        label8.setGeometry(0, 60, 400, 300)
+        label8.setAlignment(Qt.AlignCenter)
+
+        self.oknoMarginesuBledu.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
