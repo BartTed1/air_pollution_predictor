@@ -98,5 +98,7 @@ class NNTest:
 					self.correct += 1
 				else:
 					self.incorrect += 1
-			print(f"Correct Neutral Network: {self.correct}, Incorrect: {self.incorrect}")
 			return result
+
+	def pobierz_trendy(self):
+		return self.correct, self.incorrect	
