@@ -1,6 +1,5 @@
-from statistics import mean
-
 import neural_network as NeuralNetwork
+from statistics import mean
 
 class NNTest:
 	"""
@@ -14,6 +13,8 @@ class NNTest:
 		self.model: NeuralNetwork = nn
 		self.data = data
 		self.labels = labels
+		self.correct = 0
+		self.incorrect = 0
 
 	def variance(self) -> []:
 		variance = []
@@ -72,20 +73,30 @@ class NNTest:
 	def trend_accuracy(self):
 		trend = self.trend()
 		return trend[0] / (trend[0] + trend[1])
+	
 
 	def forecast(self, times: int) -> [[], []]:
-		"""
-		Creating a forecast for the given times
-
-		Need continuous time data
-		:param times: number of times to forecast
-		:return: [predicted, actual] predicted and actual values
-		"""
-		predicted = [self.data[0][4]]
-		actual = []
-		result = []
-		for i in range(times):
-			predicted.append(self.model.predict([self.data[i][:-1] + [predicted[-1]]]))
-			actual.append(self.labels[i])
-			result.append([predicted[-1], actual[-1]])
-		return result
+			"""
+			Creating a forecast for the given times
+			Need continuous time data
+			:param times: number of times to forecast
+			:return: [predicted, actual] predicted and actual values
+			"""
+			predicted = [self.data[0][4]]
+			actual = []
+			result = []
+			for i in range(times):
+				predicted.append(self.model.predict([self.data[i][:-1] + [predicted[-1]]]))
+				actual.append(self.labels[i])
+				result.append([predicted[-1], actual[-1]])
+				# trend
+				if i < 1:
+					continue
+				predicted_change = (predicted[-1] - predicted[-2]) > 0
+				actual_change = (actual[-1] - actual[-2]) > 0
+				if predicted_change == actual_change:
+					self.correct += 1
+				else:
+					self.incorrect += 1
+			print(f"Correct Neutral Network: {self.correct}, Incorrect: {self.incorrect}")
+			return result
