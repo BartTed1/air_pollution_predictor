@@ -23,9 +23,3 @@ def train_model(X_train, y_train, params):
 
 def predict(model, X_pred):
     return model.predict(X_pred)
-
-def calculate_errors(predictions, actual_values):
-    errors = predictions - actual_values
-    percentage_errors = (errors / actual_values) * 100
-    mean_percentage_error = abs(percentage_errors).mean()
-    return mean_percentage_error
