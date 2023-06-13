@@ -1,10 +1,7 @@
 import pandas as pd
-import sys
-import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
-from matplotlib.widgets import CheckButtons
 
-class LasLosowy:
+class RandomForestRegressorModel:
     def __init__(self):
         self.data_train = None
         self.data_pred = None
