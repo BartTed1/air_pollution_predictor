@@ -14,6 +14,8 @@ forest = RandomForestRegressorModel()
 sys.path.append('./model/3h/NeuralNetwork')
 import nntest as nnTest
 import neural_network as nn
+
+sys.path.append('./statistics/3h')
 import timeutils as ts
 
 class GUI(QMainWindow):
