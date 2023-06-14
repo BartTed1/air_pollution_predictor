@@ -1,5 +1,8 @@
+import sys
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+sys.path.append('./statistics/3h')
+import timeutils as ts
 
 class RandomForestRegressorModel:
     def __init__(self):
@@ -14,7 +17,13 @@ class RandomForestRegressorModel:
                         "pressure_label", "wind_speed_label", "wind_deg_label", "pm2_5_label", "pm10_label", "co_label",
                         "no_label", "no2_label", "o3_label", "so2_label", "nh3_label"]
         data = pd.read_csv(file_path, header=None, names=column_names)
-        data['timestamp'] = pd.to_datetime(data['timestamp'])
+        
+        # Rozdzielenie kolumny "timestamp" na dwie zmienne
+        data['day_in_week'] = data['timestamp'].apply(ts.timestamp_to_day_in_week_number)
+        data['hour'] = data['timestamp'].apply(ts.timestamp_to_hour)
+
+        return data
+
         return data
 
     def select_features(self, data, selected_features):
