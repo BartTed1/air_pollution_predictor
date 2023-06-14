@@ -69,7 +69,7 @@ class GUI(QMainWindow):
         self.button_wykres.clicked.connect(self.generate_plot)
 
     def closeEvent(self, event):
-        # Close all other windows
+        # Close all other windows when closing main window
         for window in self.other_windows:
             window.close()
 
