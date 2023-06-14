@@ -27,9 +27,11 @@ class GUI(QMainWindow):
         # program icon
         logo_icon = QIcon("logo.png")
         self.setWindowIcon(logo_icon)
+
+        self.other_windows = []
     
         # main label
-        self.start = QLabel("PM 2.5 value prediction", self)
+        self.start = QLabel("Pollution prediction", self)
         self.start.setGeometry(0, 10, 400, 30)
         font = QFont("Arial", 12, QFont.Bold)
         self.start.setFont(font)
@@ -65,6 +67,14 @@ class GUI(QMainWindow):
         self.button_wykres = QPushButton("Generate chart", self)
         self.button_wykres.setGeometry(120, 190, 150, 30)
         self.button_wykres.clicked.connect(self.generate_plot)
+
+    def closeEvent(self, event):
+        # Close all other windows
+        for window in self.other_windows:
+            window.close()
+
+        # Close the main window
+        event.accept()
 
     def select_file(self, data_type):
         options = QFileDialog.Options()
@@ -203,9 +213,11 @@ class GUI(QMainWindow):
             leg.set_visible(not isVisible)
             fig.canvas.draw()
 
+        self.other_windows.append(plt)
+
         fig.canvas.mpl_connect('pick_event', on_pick)
         plt.xlabel('Sample index')
-        plt.ylabel('pm2_5 value')
+        plt.ylabel('Pollution value')
         plt.title('Comparison of current and predicted values')
         plt.show()
 
@@ -234,6 +246,8 @@ class GUI(QMainWindow):
         self.TrendWindow.move(100, 100)
         logo_icon = QIcon("logo.png")
         self.TrendWindow.setWindowIcon(logo_icon)
+
+        self.other_windows.append(self.TrendWindow)
 
         font = QFont("Arial", 12, QFont.Bold)
 
@@ -267,6 +281,8 @@ class GUI(QMainWindow):
         self.oknoMarginesuBledu.move(100, 500)
         logo_icon = QIcon("logo.png")
         self.oknoMarginesuBledu.setWindowIcon(logo_icon)
+
+        self.other_windows.append(self.oknoMarginesuBledu)
 
         labelGlownyMarginesBledu = QLabel("MARGIN OF ERROR", self.oknoMarginesuBledu)
         labelGlownyMarginesBledu.setFont(font)
