@@ -20,7 +20,7 @@ def calculate_error_margin(real_values, predicted_values):
     tekst_percentage_margin_of_error = "{:.2f}%".format(percentage_margin_of_error)
     return tekst_percentage_margin_of_error
 
-selected_features = ['pm2_5', 'wind_speed', 'wind_deg', 'temp', 'humidity', 'day_in_week', 'hour']
+selected_features = ['pm2_5', 'wind_speed', 'wind_deg', 'temp', 'humidity']
 
 data_train = forest.read_data(train)
 data_pred = forest.read_data(pred)
