@@ -20,6 +20,8 @@ data
 │           ├── findBestParams.py - znajdowanie najlepszych hiperparametrów
 │           └── testParams.py - sprawdzanie zestawów parametrów z najmniejszym marginesem błędu
 ├── statistics/3h
+│   ├── statistics.py - analiza regresji liniowej dla sieci neuronowych
+│   └── timeutils.py - funkcje do zamiany daty i czasu na inny format
 ├── dane_nauka.csv
 ├── dane_predykcja.csv
 ├── gui.py - główny plik do interfejsu graficznego prognozy
