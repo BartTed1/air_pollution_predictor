@@ -2,8 +2,6 @@ import sys
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-sys.path.append('./statistics/3h')
-import timeutils as ts
 
 class RandomForestRegressorModel:
     def __init__(self):
