@@ -1,24 +1,38 @@
 # Air Pollution Predictor
-A project that implements machine learning to predict air pollution
+Projekt wykorzystujący uczenie maszynowe do przewidywania zanieczyszczenia powietrza.
+
+A project that implements machine learning to predict air pollution.
 
 ## Project structure
 ```
 data
-├── 3h
-│   └── datasets_for_model_training
 ├── data_pipeline
-│   ├── 3h
-│   │   └── data.py - fetching data
-│   └── api_key.txt - OpenWeather api key
-├── model
+│   ├── api_key_example.txt - klucz api OpenWeatherMap
 │   └── 3h
-│       ├── model.py
-│       └── neural_network.py
-│       └── random_forest.py
-│       └── svr_prediction.py
-├── statistics
-│   └── 3h
-│       └── statistics.py - statistical analysis of training data
-└── utils
-    └── utilities for model training and data processing
+│       └── 3h.py - plik do pozyskiwania danych
+├── model/3h
+│   ├── NeuralNetwork
+│   │   ├── neural_network.py - implementacja sieci neuronowych
+│   │   └── nntest.py - metody testowe dla sieci neuronowych
+│   ├── RandomForestRegressor
+│   └── forst.py - implementacja sieci neuronowych oraz testowanie
+│       └── choosingParams
+│           ├── findBestParams.py - znajdowanie najlepszych hiperparametrów
+│           └── testParams.py - sprawdzanie zestawów parametrów z najmniejszym marginesem błędu
+├── statistics/3h
+├── dane_nauka.csv
+├── dane_predykcja.csv
+├── gui.py - główny plik do interfejsu graficznego prognozy
+├── logo.png
+└── rqeuirements.txt - zależności python projektu
 ```
+
+## How to run
+Interfejs graficzny do prognozy można uruchomić poprzez plik gui.py. Wykonywanie innych predykcji możliwe jest poprzez wykorzystanie metod dostarczanych przez implementacje modeli.
+
+The graphical interface to the forecast can be run through the gui.py file. Performing other predictions is possible by using methods provided by model implementations.
+
+## How to use graphical interface
+W interfejsie graficznym należy załączyć pliki csv do nauki i predykcji w odpowiednich polach i następnie nacisnąć przycisk Generate chart.
+
+In the GUI, attach csv files for learning and prediction in the appropriate fields and then press the Generate chart button.
